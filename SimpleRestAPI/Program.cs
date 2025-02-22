@@ -1,6 +1,8 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SimpleRestAPI.Data;
+using SimpleRestAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,9 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<SchoolsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+TypeAdapterConfig<SchoolDTO, School>.NewConfig()
+    .Ignore(dest => dest.Id);  // ID'yi geç
 
 var app = builder.Build();
 

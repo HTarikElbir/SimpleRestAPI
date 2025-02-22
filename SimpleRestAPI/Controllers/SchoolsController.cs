@@ -46,6 +46,25 @@ namespace SimpleRestAPI.Controllers
             return Ok(response);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateSchool(int id, SchoolDTO updatedSchool)
+        {
+            // Retrieve the school by its ID.
+            var school = await GetSchoolById(id);
+            if (school == null)
+            {
+                return NotFound();
+            }
+
+            // Use Mapster to map the updated values from the DTO to the entity
+            school = updatedSchool.Adapt(school);
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         private async Task<School?> GetSchoolById(int id)
         {
             var school = await _context.Schools.FindAsync(id);
