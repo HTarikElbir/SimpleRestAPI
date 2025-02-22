@@ -2,7 +2,6 @@
 using SimpleRestAPI.Models;
 using SimpleRestAPI.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 using Mapster;
 
 namespace SimpleRestAPI.Controllers
@@ -34,6 +33,7 @@ namespace SimpleRestAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<School>> GetSchool(int id)
         {
+            // Retrieve the school by its ID.
             var school = await GetSchoolById(id);
 
             if (school == null)
@@ -65,6 +65,21 @@ namespace SimpleRestAPI.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSchool(int id)
+        {
+            // Retrieve the school by its ID.
+            var school = await GetSchoolById(id);
+            if (school == null)
+            {
+                return NotFound();
+            }
+            // Remove the school from the database
+            _context.Schools.Remove(school);
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
         private async Task<School?> GetSchoolById(int id)
         {
             var school = await _context.Schools.FindAsync(id);

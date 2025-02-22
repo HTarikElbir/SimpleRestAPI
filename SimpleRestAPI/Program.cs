@@ -14,8 +14,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<SchoolsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+//Configuration for Mapster
 TypeAdapterConfig<SchoolDTO, School>.NewConfig()
-    .Ignore(dest => dest.Id);  // ID'yi geç
+    .Ignore(dest => dest.Id);  
 
 var app = builder.Build();
 
