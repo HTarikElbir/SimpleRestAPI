@@ -42,7 +42,7 @@ namespace SimpleRestAPI.Controllers
 
             try
             {
-                school.Adapt(updatedSchool); // Mapster ile güncelleme
+                updatedSchool.Adapt(school); // Mapster ile güncelleme  
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
@@ -51,6 +51,7 @@ namespace SimpleRestAPI.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchool(int id)
         {
