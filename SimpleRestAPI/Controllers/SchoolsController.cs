@@ -21,69 +21,57 @@ namespace SimpleRestAPI.Controllers
         public async Task<ActionResult<List<School>>> GetSchools()
         {
             var schools = await _context.Schools.ToListAsync();
-
-            if (schools == null)
-            {
-                return NotFound();
-            }
-            var response = schools.Adapt<List<SchoolDTO>>();
-            return Ok(response);
+            
+            return schools == null ?NotFound() : Ok(schools.Adapt<List<SchoolDTO>>()); 
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<School>> GetSchool(int id)
+        public async Task<ActionResult<SchoolDTO>> GetSchool(int id)
         {
-            // Retrieve the school by its ID.
             var school = await GetSchoolById(id);
 
-            if (school == null)
-            {
-                return NotFound();
-            }
-
-            var response = school.Adapt<SchoolDTO>();
-
-            return Ok(response);
+            return school == null ? NotFound() : Ok(school.Adapt<SchoolDTO>());
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSchool(int id, SchoolDTO updatedSchool)
         {
-            // Retrieve the school by its ID.
             var school = await GetSchoolById(id);
-            if (school == null)
-            {
+            if (school == null) 
                 return NotFound();
+
+            try
+            {
+                school.Adapt(updatedSchool); // Mapster ile güncelleme
+                await _context.SaveChangesAsync();
+                return NoContent();
             }
-
-            // Use Mapster to map the updated values from the DTO to the entity
-            school = updatedSchool.Adapt(school);
-
-            // Save changes to the database
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchool(int id)
         {
-            // Retrieve the school by its ID.
-            var school = await GetSchoolById(id);
-            if (school == null)
+            try
             {
-                return NotFound();
+                var school = await GetSchoolById(id);
+                if (school == null) 
+                    return NotFound();
+
+                _context.Schools.Remove(school);
+                await _context.SaveChangesAsync();
+                return NoContent();
             }
-            // Remove the school from the database
-            _context.Schools.Remove(school);
-            // Save changes to the database
-            await _context.SaveChangesAsync();
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
         private async Task<School?> GetSchoolById(int id)
         {
-            var school = await _context.Schools.FindAsync(id);
-            return school;
+            return await _context.Schools.FindAsync(id);
         }
     }
 }
